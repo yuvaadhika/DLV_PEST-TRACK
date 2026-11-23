@@ -50,7 +50,16 @@ class ClassificationView(ctk.CTkScrollableFrame):
             fg_color=config.COLOR_THEME["primary"],
             hover_color=config.COLOR_THEME["primary_hover"],
             command=self._choose_image
-        ).pack(side="left", padx=15)
+        ).pack(side="left", padx=10)
+
+        ctk.CTkButton(
+            ctrl_frame,
+            text="📋 Paste (Ctrl+V)",
+            font=ctk.CTkFont(size=13, weight="bold"),
+            fg_color="#0288D1",
+            hover_color="#0277BD",
+            command=self._paste_image
+        ).pack(side="left", padx=5)
 
         ctk.CTkLabel(ctrl_frame, text="Quick Samples:", font=ctk.CTkFont(size=13, weight="bold")).pack(side="left", padx=(10, 5))
 
@@ -126,6 +135,25 @@ class ClassificationView(ctk.CTkScrollableFrame):
         )
         if f:
             self._analyze_file(f)
+
+    def _paste_image(self):
+        """Pastes image directly from clipboard."""
+        from utils.image_utils import get_clipboard_image
+        clip = get_clipboard_image()
+        if clip is not None:
+            pil_img, name = clip
+            self.on_paste_image(pil_img, name)
+        else:
+            messagebox.showinfo("Clipboard Empty", "No image found on clipboard! Press Ctrl+C on any image, then click Paste.")
+
+    def on_paste_image(self, pil_img: Image.Image, name: str):
+        """Handler for Ctrl+V paste."""
+        import datetime
+        temp_dir = os.path.join(config.DATA_DIR, "exports", "detections")
+        os.makedirs(temp_dir, exist_ok=True)
+        temp_path = os.path.join(temp_dir, f"paste_cls_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg")
+        pil_img.save(temp_path)
+        self._analyze_file(temp_path)
 
     def _load_sample_pest(self, pest_name):
         sample_path = os.path.join(config.SAMPLES_DIR, "pests", f"{pest_name}_sample.jpg")

@@ -58,11 +58,21 @@ class DetectionView(ctk.CTkScrollableFrame):
             hover_color=config.COLOR_THEME["primary_hover"],
             command=self._choose_image
         )
-        self.upload_btn.pack(side="left", padx=15)
+        self.upload_btn.pack(side="left", padx=10)
+
+        self.paste_btn = ctk.CTkButton(
+            ctrl_frame,
+            text="📋 Paste (Ctrl+V)",
+            font=ctk.CTkFont(size=13, weight="bold"),
+            fg_color="#0288D1",
+            hover_color="#0277BD",
+            command=self._paste_image
+        )
+        self.paste_btn.pack(side="left", padx=5)
 
         self.sample_btn = ctk.CTkButton(
             ctrl_frame,
-            text="🧪 Use High Infestation Sample",
+            text="🧪 Use Sample",
             font=ctk.CTkFont(size=13),
             fg_color=config.COLOR_THEME["secondary"],
             command=self._use_sample
@@ -140,6 +150,28 @@ class DetectionView(ctk.CTkScrollableFrame):
             self.current_image_path = f
             self._load_and_display_original(f)
             self.run_btn.configure(state="normal")
+
+    def _paste_image(self):
+        """Pastes image directly from clipboard."""
+        from utils.image_utils import get_clipboard_image
+        clip = get_clipboard_image()
+        if clip is not None:
+            pil_img, name = clip
+            self.on_paste_image(pil_img, name)
+        else:
+            messagebox.showinfo("Clipboard Empty", "No image found on clipboard! Press Ctrl+C on any image, then click Paste.")
+
+    def on_paste_image(self, pil_img: Image.Image, name: str):
+        """Handler for Ctrl+V paste."""
+        import datetime
+        temp_dir = os.path.join(config.DATA_DIR, "exports", "detections")
+        os.makedirs(temp_dir, exist_ok=True)
+        temp_path = os.path.join(temp_dir, f"paste_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg")
+        pil_img.save(temp_path)
+        self.current_image_path = temp_path
+        self._load_and_display_original(temp_path)
+        self.run_btn.configure(state="normal")
+        self._run_detection()
 
     def _use_sample(self):
         sample = os.path.join(config.SAMPLES_DIR, "leaves", "high_infestation_crop.jpg")

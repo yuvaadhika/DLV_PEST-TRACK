@@ -19,6 +19,7 @@ hidden_imports = [
     'PIL',
     'PIL.Image',
     'PIL.ImageTk',
+    'PIL.ImageGrab',
     'cv2',
     'torch',
     'torchvision',

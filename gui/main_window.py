@@ -52,6 +52,10 @@ class MainWindow(ctk.CTk):
         self._build_sidebar()
         self._build_content_area()
 
+        # Bind Global Keyboard Shortcuts (Clipboard Paste Ctrl+V)
+        self.bind_all("<Control-v>", self._handle_global_paste)
+        self.bind_all("<Control-V>", self._handle_global_paste)
+
         # Show Home View by default
         self.show_view("home")
 
@@ -167,23 +171,36 @@ class MainWindow(ctk.CTk):
 
         # Instantiate requested view
         if view_name == "home":
-            self.active_view = HomeView(self.content_frame, self)
+            self.active_view = HomeView(self.content_frame, self, **kwargs)
         elif view_name == "detection":
-            self.active_view = DetectionView(self.content_frame, self)
+            self.active_view = DetectionView(self.content_frame, self, **kwargs)
         elif view_name == "classification":
-            self.active_view = ClassificationView(self.content_frame, self)
+            self.active_view = ClassificationView(self.content_frame, self, **kwargs)
         elif view_name == "segmentation":
-            self.active_view = SegmentationView(self.content_frame, self)
+            self.active_view = SegmentationView(self.content_frame, self, **kwargs)
         elif view_name == "video":
-            self.active_view = VideoView(self.content_frame, self)
+            self.active_view = VideoView(self.content_frame, self, **kwargs)
         elif view_name == "history":
-            self.active_view = HistoryView(self.content_frame, self)
+            self.active_view = HistoryView(self.content_frame, self, **kwargs)
         elif view_name == "reports":
             self.active_view = ReportsView(self.content_frame, self, **kwargs)
         elif view_name == "about":
-            self.active_view = AboutView(self.content_frame, self)
+            self.active_view = AboutView(self.content_frame, self, **kwargs)
 
         self.active_view.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
+
+    def _handle_global_paste(self, event=None):
+        """Global handler for Ctrl+V clipboard image paste across the desktop application."""
+        from utils.image_utils import get_clipboard_image
+        clip = get_clipboard_image()
+        if clip is not None:
+            pil_img, name = clip
+            if hasattr(self.active_view, "on_paste_image"):
+                self.active_view.on_paste_image(pil_img, name)
+            else:
+                self.show_view("home")
+                if hasattr(self.active_view, "on_paste_image"):
+                    self.active_view.on_paste_image(pil_img, name)
 
     def _toggle_theme(self):
         """Toggles between Light and Dark appearance mode."""

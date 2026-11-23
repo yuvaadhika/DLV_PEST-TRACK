@@ -50,6 +50,31 @@ def cv2_to_pil(cv_img: np.ndarray) -> Image.Image:
     rgb = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
     return Image.fromarray(rgb)
 
+def get_clipboard_image() -> Optional[Tuple[Image.Image, str]]:
+    """
+    Retrieves an image from the Windows clipboard.
+    Supports both direct image copy (Snipping Tool, Web, Paint)
+    and copied image files from Windows File Explorer.
+    Returns: (PIL Image in RGB, filename) or None.
+    """
+    from PIL import ImageGrab
+    try:
+        data = ImageGrab.grabclipboard()
+        if data is None:
+            return None
+        if isinstance(data, Image.Image):
+            return data.convert("RGB"), "clipboard_pasted_image.jpg"
+        elif isinstance(data, list):
+            for item in data:
+                if isinstance(item, str) and os.path.exists(item):
+                    ext = os.path.splitext(item)[1].lower()
+                    if ext in [".jpg", ".jpeg", ".png", ".bmp", ".webp"]:
+                        pil_img = Image.open(item).convert("RGB")
+                        return pil_img, os.path.basename(item)
+    except Exception as e:
+        print(f"Error accessing clipboard: {e}")
+    return None
+
 def pil_to_ctk(pil_img: Image.Image, target_size: Tuple[int, int]) -> Any:
     """Converts a PIL image into a responsive CTkImage maintaining aspect ratio."""
     if ctk is None:
