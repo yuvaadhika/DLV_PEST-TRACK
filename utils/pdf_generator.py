@@ -190,3 +190,10 @@ def generate_pdf_report(record_data: Dict[str, Any], output_path: str) -> bool:
     except Exception as e:
         print(f"Error generating PDF report: {e}")
         return False
+
+def generate_pest_report(output_pdf_path: str, analysis_data: Dict[str, Any], result_image_path: Optional[str] = None) -> bool:
+    """Wrapper function ensuring backward & Streamlit web app compatibility."""
+    if result_image_path and "result_image_path" not in analysis_data:
+        analysis_data["result_image_path"] = result_image_path
+    return generate_pdf_report(analysis_data, output_pdf_path)
+
