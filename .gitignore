@@ -1,0 +1,45 @@
+# ==============================================================================
+# PestTrack AI - .gitignore
+# Excludes heavy local virtual environments and build distribution binaries
+# ==============================================================================
+
+# Virtual Environments
+pest_env/
+env/
+venv/
+ENV/
+
+# PyInstaller Build Artifacts (contain gigabytes of system-specific DLLs)
+dist/
+build/
+*.spec.bak
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local User Configurations & Cache
+.ultralytics/
+.matplotlib/
+
+# SQLite runtime databases
+database/*.db
+database/*.db-journal
+!database/.gitkeep
+
+# Exported outputs
+exports/reports/*
+exports/detections/*
+exports/segmentations/*
+exports/videos/*
+!exports/reports/.gitkeep
+!exports/detections/.gitkeep
+!exports/segmentations/.gitkeep
+!exports/videos/.gitkeep
+
+# Windows Desktop Shortcuts
+*.lnk
+
+# Base downloaded weight (custom trained weight is in models/yolov8_pest.pt)
+yolov8n.pt

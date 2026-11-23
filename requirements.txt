@@ -1,0 +1,28 @@
+# ==============================================================================
+# PestTrack AI - Intelligent Pest Infestation Monitoring System
+# Production Python Dependencies (Python 3.10 / 3.11 recommended)
+# ==============================================================================
+
+# 1. Deep Learning Frameworks (Pytorch & Torchvision)
+# For NVIDIA GPU (RTX 4050), install via CUDA wheel:
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+torch>=2.2.0
+torchvision>=0.17.0
+
+# 2. YOLO Object Detection & Counting
+ultralytics>=8.1.0
+
+# 3. Modern Desktop GUI
+customtkinter>=5.2.0
+pillow>=10.2.0
+
+# 4. Computer Vision & Data Handling
+opencv-python>=4.8.0
+numpy>=1.24.0,<2.0.0
+
+# 5. Charts, Dashboard Analytics & PDF Reporting
+matplotlib>=3.8.0
+reportlab>=4.1.0
+
+# 6. Windows EXE Packager
+pyinstaller>=6.4.0
