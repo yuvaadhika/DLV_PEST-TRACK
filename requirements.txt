@@ -1,9 +1,9 @@
 # ==============================================================================
 # PestTrack AI - Intelligent Pest Infestation Monitoring System
-# Production Python Dependencies
+# Production Python Dependencies for Streamlit Cloud & Web Demo
 # ==============================================================================
 
-# Web Interface (Streamlit Cloud & Local Web Demo)
+# Web Framework
 streamlit>=1.32.0
 
 # Deep Learning Frameworks
@@ -13,8 +13,7 @@ torchvision>=0.17.0
 # YOLO Object Detection & Counting
 ultralytics>=8.1.0
 
-# GUI & Imaging
-customtkinter>=5.2.0
+# Computer Vision & Imaging
 pillow>=10.2.0
 opencv-python-headless>=4.8.0
 numpy>=1.24.0,<2.0.0
