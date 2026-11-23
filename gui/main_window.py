@@ -17,7 +17,6 @@ from gui.home_view import HomeView
 from gui.detection_view import DetectionView
 from gui.classification_view import ClassificationView
 from gui.segmentation_view import SegmentationView
-from gui.video_view import VideoView
 from gui.history_view import HistoryView
 from gui.reports_view import ReportsView
 from gui.about_view import AboutView
@@ -93,7 +92,6 @@ class MainWindow(ctk.CTk):
             ("detection", "🔍  Pest Detection"),
             ("classification", "🐛  Pest Species"),
             ("segmentation", "🍃  Damage Segmentation"),
-            ("video", "📹  Video Analysis"),
             ("history", "📊  Analysis History"),
             ("reports", "📄  PDF Reports"),
             ("about", "ℹ️  About Project"),
@@ -178,8 +176,6 @@ class MainWindow(ctk.CTk):
             self.active_view = ClassificationView(self.content_frame, self, **kwargs)
         elif view_name == "segmentation":
             self.active_view = SegmentationView(self.content_frame, self, **kwargs)
-        elif view_name == "video":
-            self.active_view = VideoView(self.content_frame, self, **kwargs)
         elif view_name == "history":
             self.active_view = HistoryView(self.content_frame, self, **kwargs)
         elif view_name == "reports":

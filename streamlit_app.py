@@ -148,7 +148,7 @@ st.sidebar.markdown('<div class="sidebar-brand">🌱 PestTrack AI</div>', unsafe
 st.sidebar.markdown('<div class="sidebar-tagline">Intelligent Crop Vision System</div>', unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
-# Navigation radio mimicking the 8 desktop buttons
+# Navigation radio mimicking the desktop buttons
 nav_choice = st.sidebar.radio(
     "NAVIGATION",
     [
@@ -156,7 +156,6 @@ nav_choice = st.sidebar.radio(
         "🔍  Pest Detection",
         "🐛  Pest Species",
         "🍃  Damage Segmentation",
-        "📹  Video Analysis",
         "📊  Analysis History",
         "📄  PDF Reports",
         "ℹ️  About Project"
@@ -470,25 +469,7 @@ elif "Segmentation" in nav_choice:
                 st.image(cv2.cvtColor(seg_out["overlay"], cv2.COLOR_BGR2RGB), caption="Damage Overlay (Red Highlight)", use_container_width=True)
 
 # ==============================================================================
-# VIEW 5: 📹 VIDEO ANALYSIS
-# ==============================================================================
-elif "Video" in nav_choice:
-    st.markdown("""
-    <div class="header-card">
-        <div class="header-title">📹 Real-Time Video Pest Monitoring</div>
-        <div class="header-subtitle">Continuous Frame-by-Frame YOLO Pest Tracking & Population Counting</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    sample_video_path = "sample_data/sample_pest_video.mp4"
-    if os.path.exists(sample_video_path):
-        st.video(sample_video_path)
-        st.info("💡 Video tracking pipeline runs frame-by-frame inference using YOLOv8 with tracking ID preservation.")
-    else:
-        st.warning("Sample video file not found in sample_data directory.")
-
-# ==============================================================================
-# VIEW 6: 📊 ANALYSIS HISTORY
+# VIEW 5: 📊 ANALYSIS HISTORY
 # ==============================================================================
 elif "History" in nav_choice:
     st.markdown("""

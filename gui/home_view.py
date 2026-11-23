@@ -396,27 +396,22 @@ class HomeView(ctk.CTkScrollableFrame):
         if self.current_cv_image is None:
             return
 
-        # 1. Model 1: YOLO Detection & Counting
-        detections, det_annotated = self.pipeline.detector.detect_pests(self.current_cv_image)
+        # 1. Model 2: CNN 10-Class Species Classification
+        cls_result = self.pipeline.classifier.predict(self.current_pil_image)
+        predicted_species = cls_result["predicted_species"]
+        classification_conf = cls_result["confidence"]
+        top_preds = cls_result["top_predictions"]
+
+        # 2. Model 1: Enhanced YOLO Pest Detection & Counting with Species Hint
+        detections, det_annotated = self.pipeline.detector.detect_pests(
+            self.current_cv_image,
+            species_hint=predicted_species
+        )
         pest_count = len(detections)
         det_pil = cv2_to_pil(det_annotated)
         det_ctk = pil_to_ctk(det_pil, (320, 240))
         self.img2_label.configure(image=det_ctk, text="")
         self.img2_label.image = det_ctk
-
-        # 2. Model 2: CNN 10-Class Species Classification
-        if detections and len(detections) > 0:
-            top_box = sorted(detections, key=lambda x: x["confidence"], reverse=True)[0]["bbox"]
-            x1, y1, x2, y2 = [int(v) for v in top_box]
-            h, w = self.current_cv_image.shape[:2]
-            crop_pil = self.current_pil_image.crop((max(0, x1-10), max(0, y1-10), min(w, x2+10), min(h, y2+10)))
-            cls_result = self.pipeline.classifier.predict(crop_pil)
-        else:
-            cls_result = self.pipeline.classifier.predict(self.current_pil_image)
-
-        predicted_species = cls_result["predicted_species"]
-        classification_conf = cls_result["confidence"]
-        top_preds = cls_result["top_predictions"]
 
         # 3. Model 3: U-Net Leaf Damage & Disease Segmentation
         seg_result = self.pipeline.segmentor.segment_leaf(self.current_cv_image)
@@ -463,13 +458,19 @@ class HomeView(ctk.CTkScrollableFrame):
         full_rec_text = f"{advisory}\n\n📉 Estimated Potential Yield Loss Range: {yield_range} | Notice: {config.DISCLAIMER_TEXT}"
         self.rec_label.configure(text=full_rec_text, text_color=config.COLOR_THEME["text_dark"])
 
-        # 5. Save comparison & Log into Database
+        # 5. Save visual evidence & Log into Database
         timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         comp_img = create_side_by_side_comparison(self.current_cv_image, damage_mask, seg_overlay, damage_pct)
         res_save_path = os.path.join(config.SEGMENTATIONS_DIR, f"comp_{timestamp_str}_{self.current_image_name}")
         cv2.imwrite(res_save_path, comp_img)
 
-        # Save original if needed
+        det_save_path = os.path.join(config.DETECTIONS_DIR, f"det_{timestamp_str}_{self.current_image_name}")
+        cv2.imwrite(det_save_path, det_annotated)
+
+        seg_save_path = os.path.join(config.SEGMENTATIONS_DIR, f"seg_{timestamp_str}_{self.current_image_name}")
+        cv2.imwrite(seg_save_path, seg_overlay)
+
+        # Save original foliage image
         orig_save_path = os.path.join(config.DATA_DIR, "exports", "detections", f"orig_{timestamp_str}_{self.current_image_name}")
         cv2.imwrite(orig_save_path, self.current_cv_image)
 
@@ -483,7 +484,7 @@ class HomeView(ctk.CTkScrollableFrame):
             confidence=classification_conf,
             damage_percentage=damage_pct,
             severity_level=severity,
-            notes=f"Unified analysis: {pest_count} pests, {damage_pct:.1f}% damage.",
+            notes=f"det:{det_save_path}|seg:{seg_save_path}",
             detections=detections
         )
 
