@@ -8,7 +8,10 @@ import os
 import cv2
 import numpy as np
 from PIL import Image
-import customtkinter as ctk
+try:
+    import customtkinter as ctk
+except (ImportError, ModuleNotFoundError):
+    ctk = None
 from typing import Tuple, List, Dict, Any, Optional
 
 def load_image_cv(image_path: str) -> Optional[np.ndarray]:
@@ -47,9 +50,10 @@ def cv2_to_pil(cv_img: np.ndarray) -> Image.Image:
     rgb = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
     return Image.fromarray(rgb)
 
-def pil_to_ctk(pil_img: Image.Image, target_size: Tuple[int, int]) -> ctk.CTkImage:
+def pil_to_ctk(pil_img: Image.Image, target_size: Tuple[int, int]) -> Any:
     """Converts a PIL image into a responsive CTkImage maintaining aspect ratio."""
-    # Compute proportional size
+    if ctk is None:
+        return pil_img
     orig_w, orig_h = pil_img.size
     target_w, target_h = target_size
 
