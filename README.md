@@ -1,6 +1,6 @@
 # 🌱 PestTrack AI: Intelligent Pest Infestation Monitoring and Crop Damage Analysis System Using Deep Learning
 
-**Course:** 2nd Year B.Tech / B.E. - Artificial Intelligence & Machine Learning (AIML)  
+**Course:** 3rd Year B.Tech / B.E. - Artificial Intelligence & Machine Learning (AIML)  
 **Subject:** Deep Learning for Vision (DLV) - Real-Time Case Study Project  
 **Author:** Yuvaadhika  
 **Platform:** Windows Desktop Application (100% Offline, No Web/Browser)  
