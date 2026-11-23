@@ -1,6 +1,6 @@
 """
 ================================================================================
-PestTrack AI - About Project & DLV Viva Documentation View
+PestTrack AI - System Architecture & Technical Specifications
 ================================================================================
 """
 
@@ -8,13 +8,15 @@ import customtkinter as ctk
 import config
 
 class AboutView(ctk.CTkScrollableFrame):
+    """System Architecture, AI Models, and Technical Specifications View."""
+
     def __init__(self, parent, controller):
         super().__init__(parent, fg_color="transparent")
         self.controller = controller
         self._build_ui()
 
     def _build_ui(self):
-        # Header
+        # 1. Header Banner
         header = ctk.CTkFrame(self, fg_color=config.COLOR_THEME["primary"], corner_radius=10)
         header.pack(fill="x", pady=(0, 15), padx=5, ipady=15)
 
@@ -32,47 +34,60 @@ class AboutView(ctk.CTkScrollableFrame):
             text_color="#E8F5E9"
         ).pack(anchor="w", padx=20, pady=(0, 6))
 
-        # Academic Credentials Card
-        acad_card = ctk.CTkFrame(self, fg_color=config.COLOR_THEME["card_light"], corner_radius=10)
-        acad_card.pack(fill="x", pady=(0, 15), padx=5, ipady=12)
+        # 2. System Overview & Core Capabilities Card
+        sys_card = ctk.CTkFrame(self, fg_color=config.COLOR_THEME["card_light"], corner_radius=10)
+        sys_card.pack(fill="x", pady=(0, 15), padx=5, ipady=12)
 
-        ctk.CTkLabel(acad_card, text="🎓 Academic Project Profile", font=ctk.CTkFont(size=16, weight="bold"), text_color=config.COLOR_THEME["primary"]).pack(anchor="w", padx=20, pady=(6, 6))
+        ctk.CTkLabel(
+            sys_card,
+            text="⚡ System Capabilities & Highlights",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color=config.COLOR_THEME["primary"]
+        ).pack(anchor="w", padx=20, pady=(6, 6))
 
-        details = [
-            ("Course / Degree", "2nd Year B.Tech / B.E. - Artificial Intelligence & Machine Learning (AIML)"),
-            ("Subject", "Deep Learning for Vision (DLV)"),
-            ("Project Category", "Advanced Computer Vision & Real-Time Case Study Software"),
-            ("Target Deliverable", "Completely Offline Standalone Windows Executable (PestTrack_AI.exe)"),
-            ("Primary Hardware", "NVIDIA GeForce RTX 4050 GPU (CUDA 12.x Accelerated)")
+        highlights = [
+            ("Multi-Model Vision", "Simultaneously executes YOLOv8 object detection, 4-stage CNN classification, and U-Net semantic segmentation."),
+            ("100% Offline Ready", "Fully self-contained Windows application requiring zero cloud connectivity, external servers, or API subscriptions."),
+            ("Smart Duplicate Prevention", "Integrated SQLite database engine automatically updates records for existing samples, avoiding redundant data."),
+            ("Direct Clipboard Paste", "Instant image input via Ctrl+V or one-click clipboard pasting from Web, Snipping Tool, or File Explorer."),
+            ("Automated PDF Reporting", "Generates publication-quality agronomist advisory inspection documents with visual evidence and action recommendations.")
         ]
 
-        for k, v in details:
-            row = ctk.CTkFrame(acad_card, fg_color="transparent")
-            row.pack(fill="x", padx=20, pady=2)
-            ctk.CTkLabel(row, text=f"• {k}:", width=180, anchor="w", font=ctk.CTkFont(size=12, weight="bold")).pack(side="left")
-            ctk.CTkLabel(row, text=v, anchor="w", font=ctk.CTkFont(size=12), text_color="#333333").pack(side="left")
+        for k, v in highlights:
+            row = ctk.CTkFrame(sys_card, fg_color="transparent")
+            row.pack(fill="x", padx=20, pady=3)
+            ctk.CTkLabel(row, text=f"• {k}:", width=190, anchor="w", font=ctk.CTkFont(size=12, weight="bold"), text_color=config.COLOR_THEME["text_dark"]).pack(side="left")
+            ctk.CTkLabel(row, text=v, anchor="w", font=ctk.CTkFont(size=12), text_color="#444444").pack(side="left")
 
-        # 3 AI Models Technical Architecture Card
+        # 3. 3 AI Models Technical Architecture Card
         models_card = ctk.CTkFrame(self, fg_color=config.COLOR_THEME["card_light"], corner_radius=10)
         models_card.pack(fill="x", pady=(0, 15), padx=5, ipady=12)
 
-        ctk.CTkLabel(models_card, text="🤖 Integrated 3-Pillar Computer Vision Engine", font=ctk.CTkFont(size=16, weight="bold"), text_color=config.COLOR_THEME["primary"]).pack(anchor="w", padx=20, pady=(6, 10))
+        ctk.CTkLabel(
+            models_card,
+            text="🤖 Integrated 3-Pillar Computer Vision Engine",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color=config.COLOR_THEME["primary"]
+        ).pack(anchor="w", padx=20, pady=(6, 10))
 
         model_specs = [
             (
-                "Model 1: YOLOv8 (Pest Detection & Counting)",
+                "Model 1: YOLOv8 (Pest Detection & Density Counting)",
                 "Architecture: Single-stage Anchor-Free Object Detector\n"
-                "Function: Identifies insect positions with bounding boxes, computes pest density, and provides real-time detection in images and video streams."
+                "Function: Identifies insect positions with bounding boxes, computes pest density, and provides real-time detection in images and video streams.\n"
+                "Saved Weights: models/yolov8_pest.pt"
             ),
             (
                 "Model 2: PyTorch CNN (Pest Species Classification)",
                 "Architecture: 4-Stage Hierarchical Convolutional Network with BatchNorm & Dropout\n"
-                "Function: Categorizes detected pests into 10 agricultural classes (Aphids, Armyworm, Beetle, Bollworm, Grasshopper, etc.) and provides Top-3 confidence distributions."
+                "Function: Categorizes detected pests into 10 agricultural classes (Aphids, Armyworm, Beetle, Bollworm, Grasshopper, Leafhopper, Mealybug, Mites, Stem Borer, Whitefly) with Top-3 confidence distributions.\n"
+                "Saved Weights: models/pest_classifier_cnn.pth"
             ),
             (
-                "Model 3: PyTorch U-Net (Leaf Damage Semantic Segmentation)",
+                "Model 3: PyTorch U-Net (Leaf Damage & Disease Semantic Segmentation)",
                 "Architecture: Symmetric Encoder-Decoder with Skip Connections & Sigmoid Masking\n"
-                "Function: Segments visible damaged regions (chlorosis, necrosis, chewing holes), generates binary damage masks, and calculates damaged-area percentage."
+                "Function: Segments visible damaged regions (chlorosis, necrosis, chewing holes), generates binary damage masks, and calculates damaged-area percentage.\n"
+                "Saved Weights: models/leaf_damage_unet.pth"
             )
         ]
 
@@ -82,11 +97,16 @@ class AboutView(ctk.CTkScrollableFrame):
             ctk.CTkLabel(box, text=m_title, font=ctk.CTkFont(size=13, weight="bold"), text_color=config.COLOR_THEME["primary"]).pack(anchor="w", padx=12, pady=(4, 2))
             ctk.CTkLabel(box, text=m_desc, font=ctk.CTkFont(size=11), text_color="#444444", justify="left").pack(anchor="w", padx=12, pady=(0, 4))
 
-        # Severity Rule Engine & Yield Loss Disclaimer
+        # 4. Severity Rule Engine & Scientific Disclaimer Card
         rule_card = ctk.CTkFrame(self, fg_color=config.COLOR_THEME["card_light"], corner_radius=10)
         rule_card.pack(fill="x", pady=(0, 15), padx=5, ipady=12)
 
-        ctk.CTkLabel(rule_card, text="⚖️ Infestation Severity Matrix & Scientific Disclaimer", font=ctk.CTkFont(size=16, weight="bold"), text_color=config.COLOR_THEME["primary"]).pack(anchor="w", padx=20, pady=(6, 6))
+        ctk.CTkLabel(
+            rule_card,
+            text="⚖️ Infestation Severity Matrix & Scientific Disclaimer",
+            font=ctk.CTkFont(size=16, weight="bold"),
+            text_color=config.COLOR_THEME["primary"]
+        ).pack(anchor="w", padx=20, pady=(6, 6))
 
         rules_text = (
             "• Low Infestation    : Pest count <= 2 AND Leaf Damage < 10%\n"
@@ -99,7 +119,7 @@ class AboutView(ctk.CTkScrollableFrame):
         disc_box.pack(fill="x", padx=20, pady=(8, 4), ipady=6)
         ctk.CTkLabel(
             disc_box,
-            text=f"Scientific Notice: {config.DISCLAIMER_TEXT}",
+            text=f"Notice: {config.DISCLAIMER_TEXT}",
             font=ctk.CTkFont(size=11),
             text_color="#616161",
             wraplength=850

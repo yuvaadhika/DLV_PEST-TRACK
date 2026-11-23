@@ -11,7 +11,7 @@ import sys
 APP_NAME = "PestTrack AI"
 APP_TITLE = "Intelligent Pest Infestation Monitoring & Crop Damage Analysis System"
 APP_VERSION = "2.0.0"
-AUTHOR = "2nd Year AIML - Deep Learning for Vision"
+AUTHOR = "Deep Learning Vision Engineering"
 
 # Paths
 def get_base_dir():
