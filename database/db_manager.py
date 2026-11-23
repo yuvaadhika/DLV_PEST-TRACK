@@ -70,6 +70,30 @@ class DatabaseManager:
             """)
             conn.commit()
 
+        # Automatically clean up any existing duplicate entries
+        self.deduplicate_records()
+
+    def deduplicate_records(self):
+        """Cleans up duplicate records by keeping only the latest entry per image_name."""
+        try:
+            with self._get_connection() as conn:
+                cur = conn.cursor()
+                cur.execute("""
+                    DELETE FROM pest_detections 
+                    WHERE analysis_id NOT IN (
+                        SELECT MAX(id) FROM analysis_history GROUP BY image_name
+                    );
+                """)
+                cur.execute("""
+                    DELETE FROM analysis_history 
+                    WHERE id NOT IN (
+                        SELECT MAX(id) FROM analysis_history GROUP BY image_name
+                    );
+                """)
+                conn.commit()
+        except Exception as e:
+            print(f"Error deduplicating database records: {e}")
+
     def insert_analysis(self,
                         analysis_type: str,
                         image_name: str,
@@ -82,22 +106,54 @@ class DatabaseManager:
                         severity_level: str = "Low",
                         notes: str = "",
                         detections: Optional[List[Dict[str, Any]]] = None) -> int:
-        """Inserts a new analysis record and associated bounding boxes."""
+        """
+        Inserts or updates an analysis record avoiding duplicates.
+        If an image with the same image_name was already analyzed, updates the existing row.
+        """
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with self._get_connection() as conn:
             cur = conn.cursor()
-            cur.execute("""
-                INSERT INTO analysis_history (
+
+            # Prevent duplicates: Check if image_name already exists in database
+            cur.execute("SELECT id FROM analysis_history WHERE image_name = ?", (image_name,))
+            existing = cur.fetchone()
+
+            if existing:
+                analysis_id = existing["id"]
+                cur.execute("""
+                    UPDATE analysis_history SET
+                        timestamp = ?,
+                        analysis_type = ?,
+                        original_image_path = ?,
+                        result_image_path = ?,
+                        pest_count = ?,
+                        primary_pest_species = ?,
+                        confidence = ?,
+                        damage_percentage = ?,
+                        severity_level = ?,
+                        notes = ?
+                    WHERE id = ?
+                """, (
+                    timestamp, analysis_type, original_image_path,
+                    result_image_path, pest_count, primary_pest_species,
+                    round(confidence, 2), round(damage_percentage, 2), severity_level, notes,
+                    analysis_id
+                ))
+                # Delete old detections for this analysis_id before re-inserting
+                cur.execute("DELETE FROM pest_detections WHERE analysis_id = ?", (analysis_id,))
+            else:
+                cur.execute("""
+                    INSERT INTO analysis_history (
+                        timestamp, analysis_type, image_name, original_image_path,
+                        result_image_path, pest_count, primary_pest_species,
+                        confidence, damage_percentage, severity_level, notes
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
                     timestamp, analysis_type, image_name, original_image_path,
                     result_image_path, pest_count, primary_pest_species,
-                    confidence, damage_percentage, severity_level, notes
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                timestamp, analysis_type, image_name, original_image_path,
-                result_image_path, pest_count, primary_pest_species,
-                round(confidence, 2), round(damage_percentage, 2), severity_level, notes
-            ))
-            analysis_id = cur.lastrowid
+                    round(confidence, 2), round(damage_percentage, 2), severity_level, notes
+                ))
+                analysis_id = cur.lastrowid
 
             if detections and analysis_id:
                 for d in detections:
@@ -108,7 +164,7 @@ class DatabaseManager:
                         ) VALUES (?, ?, ?, ?, ?, ?, ?)
                     """, (
                         analysis_id,
-                        d.get("class", "Pest"),
+                        d.get("class", d.get("class_name", "Pest")),
                         round(d.get("confidence", 0.0), 2),
                         d.get("bbox", [0, 0, 0, 0])[0],
                         d.get("bbox", [0, 0, 0, 0])[1],

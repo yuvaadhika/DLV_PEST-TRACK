@@ -509,8 +509,19 @@ class HomeView(ctk.CTkScrollableFrame):
         self._refresh_recents_table()
 
     def _on_export_pdf(self):
-        """Generates and opens the formal agronomic PDF report."""
+        """Generates and opens the formal agronomic PDF report after user confirmation."""
         if not self.analysis_result:
+            return
+
+        # User confirmation dialog before generating & downloading PDF
+        confirm = messagebox.askyesno(
+            "Confirm PDF Download",
+            "Are you sure you want to generate and download the official PDF inspection report?\n\n"
+            f"• Image: {self.current_image_name}\n"
+            f"• Severity Level: {self.analysis_result.get('severity_level', 'Low').upper()}\n\n"
+            "Click 'Yes' to proceed with generation."
+        )
+        if not confirm:
             return
 
         timestamp_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")

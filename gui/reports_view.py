@@ -172,6 +172,18 @@ class ReportsView(ctk.CTkScrollableFrame):
         if not self.current_record:
             return
 
+        # User confirmation dialog before generating & downloading PDF
+        confirm = messagebox.askyesno(
+            "Confirm PDF Download",
+            "Are you sure you want to generate and download the official PDF inspection report?\n\n"
+            f"• Record ID: PT-{self.current_record['id']:04d}\n"
+            f"• Image: {self.current_record.get('image_name', 'Crop')}\n"
+            f"• Severity: {self.current_record.get('severity_level', 'Low').upper()}\n\n"
+            "Click 'Yes' to proceed with generation."
+        )
+        if not confirm:
+            return
+
         r_id = self.current_record["id"]
         pdf_filename = f"PestTrack_Report_PT{r_id:04d}.pdf"
         output_pdf_path = os.path.join(config.REPORTS_DIR, pdf_filename)
